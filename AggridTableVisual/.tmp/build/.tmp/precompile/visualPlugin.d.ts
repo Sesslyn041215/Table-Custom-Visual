@@ -1,0 +1,4 @@
+import powerbiVisualsApi from "powerbi-visuals-api";
+import IVisualPlugin = powerbiVisualsApi.visuals.plugins.IVisualPlugin;
+declare var agGridTableVisualC66499378846423EAD2F2526D8D57D27_DEBUG: IVisualPlugin;
+export default agGridTableVisualC66499378846423EAD2F2526D8D57D27_DEBUG;

@@ -1,0 +1,91 @@
+.table-visual {
+  display: grid;
+  font-family: Arial, sans-serif;
+  padding: 10px;
+  margin-bottom: 20px;
+  height: 100%;
+  margin-top: 50px;
+  grid-template-rows: 40% 60%;
+}
+.table-visual .table-visual-header {
+  display: grid;
+  width: 100%;
+}
+.table-visual .left-section {
+  flex: 1;
+  height: 135px;
+}
+.table-visual .right-section {
+  flex: 1;
+}
+.table-visual h2 {
+  color: #333;
+  margin: 0;
+}
+.table-visual p {
+  color: #666;
+  margin-top: 5px;
+}
+.table-visual .formatting-controls {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  width: 299px;
+  margin-top: 16px;
+}
+.table-visual .formatting-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  font-size: 16px;
+}
+.table-visual .formatting-button.active {
+  color: blue;
+}
+.table-visual select {
+  padding: 5px;
+  font-size: 14px;
+}
+.table-visual .table {
+  width: 50%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+.table-visual th,
+.table-visual td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+.table-visual th {
+  background-color: #f2f2f2;
+}
+.table-visual tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+.formatted-cell {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.formatted-cell.bold {
+  font-weight: bold;
+}
+.formatted-cell.italic {
+  font-style: italic;
+}
+.formatted-cell.underline {
+  text-decoration: underline;
+}
+.dark-theme {
+  background-color: #333;
+  color: #fff;
+}
+.dark-theme .table-visual th {
+  background-color: #444;
+}
+.dark-theme .table-visual tbody tr:nth-child(even) {
+  background-color: #555;
+}
