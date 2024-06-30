@@ -17,6 +17,7 @@
 }
 .table-visual .right-section {
   flex: 1;
+  margin-top: 277px;
 }
 .table-visual h2 {
   color: #333;

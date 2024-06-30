@@ -1683,49 +1683,52 @@ class VisualFormattingSettingsModel extends FormattingSettingsModel {
 
 
 const TableVisual = ({ row, col, title = "Default Title", subtitle = "Default Subtitle", formattingSettings, onSettingsChange, }) => {
-    const handleToggleBold = () => {
-        onSettingsChange(Object.assign(Object.assign({}, formattingSettings), { bold: !formattingSettings.bold }));
+    const handleToggle = (property) => {
+        const newSettings = Object.assign({ bold: false, italic: false, underline: false }, formattingSettings);
+        if (property) {
+            switch (property) {
+                case "bold":
+                    newSettings.italic = false;
+                    newSettings.underline = false;
+                    newSettings.bold = true;
+                    break;
+                case "italic":
+                    newSettings.bold = false;
+                    newSettings.underline = false;
+                    newSettings.italic = true;
+                    break;
+                case "underline":
+                    newSettings.bold = false;
+                    newSettings.italic = false;
+                    newSettings.underline = true;
+                    break;
+                default:
+                    break;
+            }
+        }
+        onSettingsChange(newSettings);
     };
-    const handleToggleItalic = () => {
-        onSettingsChange(Object.assign(Object.assign({}, formattingSettings), { italic: !formattingSettings.italic }));
+    const handleThemeChange = (key) => {
+        onSettingsChange(Object.assign(Object.assign({}, formattingSettings), { theme: key }));
     };
-    const handleToggleUnderline = () => {
-        onSettingsChange(Object.assign(Object.assign({}, formattingSettings), { underline: !formattingSettings.underline }));
-    };
-    const handleThemeChange = (event) => {
-        const newTheme = event.target.value;
-        onSettingsChange(Object.assign(Object.assign({}, formattingSettings), { theme: newTheme }));
-    };
-    const handleScalingChange = (event) => {
-        const newScaling = event.target.value;
-        onSettingsChange(Object.assign(Object.assign({}, formattingSettings), { scaling: newScaling }));
+    const handleScalingChange = (key) => {
+        onSettingsChange(Object.assign(Object.assign({}, formattingSettings), { scaling: key }));
     };
     const formatNumber = (value, scaling) => {
-        if (!isNaN(value) && isFinite(value)) {
+        const numericValue = typeof value === 'string' ? parseFloat(value.replace(/[^\d.-]/g, '')) : value;
+        if (!isNaN(numericValue) && isFinite(numericValue)) {
             switch (scaling) {
-                case "trillions":
-                    return (value / 1e12).toFixed(2) + "T";
-                case "billions":
-                    return (value / 1e9).toFixed(2) + "B";
                 case "millions":
-                    return (value / 1e6).toFixed(2) + "M";
+                    return (numericValue / 1e6).toFixed(2);
                 case "thousands":
-                    return (value / 1e3).toFixed(2) + "K";
-                case "auto":
-                    // Automatically determine based on value size
-                    if (value >= 1e12)
-                        return (value / 1e12).toFixed(2) + "T";
-                    if (value >= 1e9)
-                        return (value / 1e9).toFixed(2) + "B";
-                    if (value >= 1e6)
-                        return (value / 1e6).toFixed(2) + "M";
-                    if (value >= 1e3)
-                        return (value / 1e3).toFixed(2) + "K";
-                    return value.toFixed(2); // Default case
+                    return (numericValue / 1e3).toFixed(2);
                 case "none":
                 default:
-                    return value.toFixed(2);
+                    return numericValue.toString();
             }
+        }
+        else {
+            return "";
         }
     };
     return (react__WEBPACK_IMPORTED_MODULE_1__.createElement("div", { className: `table-visual ${formattingSettings.theme === "dark" ? "dark-theme" : "light-theme"}` },
@@ -1736,26 +1739,23 @@ const TableVisual = ({ row, col, title = "Default Title", subtitle = "Default Su
                     react__WEBPACK_IMPORTED_MODULE_1__.createElement("div", { className: "label" },
                         react__WEBPACK_IMPORTED_MODULE_1__.createElement("div", null, "Formatting"),
                         react__WEBPACK_IMPORTED_MODULE_1__.createElement("div", null,
-                            react__WEBPACK_IMPORTED_MODULE_1__.createElement("button", { className: `formatting-button ${formattingSettings.bold ? "active" : ""}`, onClick: handleToggleBold },
+                            react__WEBPACK_IMPORTED_MODULE_1__.createElement("button", { className: `formatting-button ${formattingSettings.bold ? "active" : ""}`, onClick: () => handleToggle("bold") },
                                 react__WEBPACK_IMPORTED_MODULE_1__.createElement(_fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_0__/* .FontAwesomeIcon */ .g, { icon: _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_2__/* .faBold */ .l5I })),
-                            react__WEBPACK_IMPORTED_MODULE_1__.createElement("button", { className: `formatting-button ${formattingSettings.italic ? "active" : ""}`, onClick: handleToggleItalic },
+                            react__WEBPACK_IMPORTED_MODULE_1__.createElement("button", { className: `formatting-button ${formattingSettings.italic ? "active" : ""}`, onClick: () => handleToggle("italic") },
                                 react__WEBPACK_IMPORTED_MODULE_1__.createElement(_fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_0__/* .FontAwesomeIcon */ .g, { icon: _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_2__/* .faItalic */ .SIw })),
-                            react__WEBPACK_IMPORTED_MODULE_1__.createElement("button", { className: `formatting-button ${formattingSettings.underline ? "active" : ""}`, onClick: handleToggleUnderline },
+                            react__WEBPACK_IMPORTED_MODULE_1__.createElement("button", { className: `formatting-button ${formattingSettings.underline ? "active" : ""}`, onClick: () => handleToggle("underline") },
                                 react__WEBPACK_IMPORTED_MODULE_1__.createElement(_fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_0__/* .FontAwesomeIcon */ .g, { icon: _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_2__/* .faUnderline */ .chs })))),
                     react__WEBPACK_IMPORTED_MODULE_1__.createElement("div", { className: "label" },
                         react__WEBPACK_IMPORTED_MODULE_1__.createElement("div", null, "Scaling"),
                         react__WEBPACK_IMPORTED_MODULE_1__.createElement("div", null,
-                            react__WEBPACK_IMPORTED_MODULE_1__.createElement("select", { value: formattingSettings.scaling, onChange: handleScalingChange },
+                            react__WEBPACK_IMPORTED_MODULE_1__.createElement("select", { value: formattingSettings.scaling, onChange: (e) => handleScalingChange(e.target.value) },
                                 react__WEBPACK_IMPORTED_MODULE_1__.createElement("option", { value: "none" }, "None"),
                                 react__WEBPACK_IMPORTED_MODULE_1__.createElement("option", { value: "thousands" }, "Thousands"),
-                                react__WEBPACK_IMPORTED_MODULE_1__.createElement("option", { value: "millions" }, "Millions"),
-                                react__WEBPACK_IMPORTED_MODULE_1__.createElement("option", { value: "auto" }, "Auto"),
-                                react__WEBPACK_IMPORTED_MODULE_1__.createElement("option", { value: "billions" }, "Billions"),
-                                react__WEBPACK_IMPORTED_MODULE_1__.createElement("option", { value: "trillions" }, "Trillions")))),
+                                react__WEBPACK_IMPORTED_MODULE_1__.createElement("option", { value: "millions" }, "Millions")))),
                     react__WEBPACK_IMPORTED_MODULE_1__.createElement("div", { className: "label" },
                         react__WEBPACK_IMPORTED_MODULE_1__.createElement("div", null, "Theme"),
                         react__WEBPACK_IMPORTED_MODULE_1__.createElement("div", null,
-                            react__WEBPACK_IMPORTED_MODULE_1__.createElement("select", { value: formattingSettings.theme, onChange: handleThemeChange },
+                            react__WEBPACK_IMPORTED_MODULE_1__.createElement("select", { value: formattingSettings.theme, onChange: (e) => handleThemeChange(e.target.value) },
                                 react__WEBPACK_IMPORTED_MODULE_1__.createElement("option", { value: "light" }, "Light"),
                                 react__WEBPACK_IMPORTED_MODULE_1__.createElement("option", { value: "dark" }, "Dark")))))),
             react__WEBPACK_IMPORTED_MODULE_1__.createElement("div", { className: "right-section" },
@@ -1819,14 +1819,14 @@ class Visual {
         console.log("Visual constructor", options);
         this.target = options.element;
         this.formattingSettingsService = new powerbi_visuals_utils_formattingmodel__WEBPACK_IMPORTED_MODULE_0__/* .FormattingSettingsService */ .O();
-        this.formattingSettings = Object.assign({}, _settings__WEBPACK_IMPORTED_MODULE_3__/* .defaultFormattingSettings */ .u);
         this.host = options.host;
+        this.formattingSettings = Object.assign({}, _settings__WEBPACK_IMPORTED_MODULE_3__/* .defaultFormattingSettings */ .u);
     }
     update(options) {
         const dataViews = options.dataViews;
         console.log(options);
         this.formattingSettings =
-            this.formattingSettingsService.populateFormattingSettingsModel(_settings__WEBPACK_IMPORTED_MODULE_3__/* .VisualFormattingSettingsModel */ .S, options.dataViews[0]);
+            this.formattingSettingsService.populateFormattingSettingsModel(_settings__WEBPACK_IMPORTED_MODULE_3__/* .VisualFormattingSettingsModel */ .S, options.dataViews[0]) || _settings__WEBPACK_IMPORTED_MODULE_3__/* .defaultFormattingSettings */ .u;
         this.columnData = dataViews[0].table.columns.map((item) => ({
             field: item.displayName,
         }));

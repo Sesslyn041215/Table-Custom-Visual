@@ -24,68 +24,69 @@ const TableVisual: React.FC<TableVisualProps> = ({
   formattingSettings,
   onSettingsChange,
 }) => {
-  const handleToggleBold = () => {
-    onSettingsChange({ ...formattingSettings, bold: !formattingSettings.bold });
+  const handleToggle = (property: keyof VisualFormattingSettingsModel) => {
+    const newSettings: VisualFormattingSettingsModel = {
+      bold: false,
+      italic: false,
+      underline: false,
+      ...formattingSettings, 
+    };
+ 
+    if (property) {
+      switch (property) {
+        case "bold":
+          newSettings.italic = false;
+          newSettings.underline = false;
+          newSettings.bold = true;
+          break;
+        case "italic":
+          newSettings.bold = false;
+          newSettings.underline = false;
+          newSettings.italic = true;
+          break;
+        case "underline":
+          newSettings.bold = false;
+          newSettings.italic = false;
+          newSettings.underline = true;
+          break;
+        default:
+          break;
+      }
+    }
+    onSettingsChange(newSettings);
+  };
+  
+  const handleThemeChange = (key: VisualFormattingSettingsModel["theme"]) => {
+    onSettingsChange({ ...formattingSettings, theme: key });
   };
 
-  const handleToggleItalic = () => {
-    onSettingsChange({
-      ...formattingSettings,
-      italic: !formattingSettings.italic,
-    });
-  };
-
-  const handleToggleUnderline = () => {
-    onSettingsChange({
-      ...formattingSettings,
-      underline: !formattingSettings.underline,
-    });
-  };
-
-  const handleThemeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const newTheme = event.target.value as "light" | "dark";
-    onSettingsChange({ ...formattingSettings, theme: newTheme });
-  };
-
-  const handleScalingChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const newScaling = event.target.value as
-      | "none"
-      | "thousands"
-      | "millions"
-      | "auto"
-      | "billions"
-      | "trillions";
-    onSettingsChange({ ...formattingSettings, scaling: newScaling });
+  const handleScalingChange = (
+    key: VisualFormattingSettingsModel["scaling"]
+  ) => {
+    onSettingsChange({ ...formattingSettings, scaling: key });
   };
 
   const formatNumber = (
-    value: number,
+    value: number | string,
     scaling: VisualFormattingSettingsModel["scaling"]
   ): string => {
-    if (!isNaN(value) && isFinite(value)) {
+    const numericValue = typeof value === 'string' ? parseFloat(value.replace(/[^\d.-]/g, '')) : value;
+  
+    if (!isNaN(numericValue) && isFinite(numericValue)) {
       switch (scaling) {
-        case "trillions":
-          return (value / 1e12).toFixed(2) + "T";
-        case "billions":
-          return (value / 1e9).toFixed(2) + "B";
         case "millions":
-          return (value / 1e6).toFixed(2) + "M";
+          return (numericValue / 1e6).toFixed(2);
         case "thousands":
-          return (value / 1e3).toFixed(2) + "K";
-        case "auto":
-          // Automatically determine based on value size
-          if (value >= 1e12) return (value / 1e12).toFixed(2) + "T";
-          if (value >= 1e9) return (value / 1e9).toFixed(2) + "B";
-          if (value >= 1e6) return (value / 1e6).toFixed(2) + "M";
-          if (value >= 1e3) return (value / 1e3).toFixed(2) + "K";
-          return value.toFixed(2); // Default case
+          return (numericValue / 1e3).toFixed(2);
         case "none":
         default:
-          return value.toFixed(2);
+          return numericValue.toString();
       }
+    } else {
+      return ""; 
     }
   };
-
+  
   return (
     <div
       className={`table-visual ${
@@ -94,7 +95,7 @@ const TableVisual: React.FC<TableVisualProps> = ({
     >
       <div className="table-visual-header">
         <div className="left-section">
-        <h2>{JSON.stringify(formattingSettings, null, 2)}</h2>
+          <h2>{JSON.stringify(formattingSettings, null, 2)}</h2>
           <div className="formatting-controls">
             <div className="label">
               <div>Formatting</div>
@@ -103,7 +104,7 @@ const TableVisual: React.FC<TableVisualProps> = ({
                   className={`formatting-button ${
                     formattingSettings.bold ? "active" : ""
                   }`}
-                  onClick={handleToggleBold}
+                  onClick={() => handleToggle("bold")}
                 >
                   <FontAwesomeIcon icon={faBold} />
                 </button>
@@ -111,7 +112,7 @@ const TableVisual: React.FC<TableVisualProps> = ({
                   className={`formatting-button ${
                     formattingSettings.italic ? "active" : ""
                   }`}
-                  onClick={handleToggleItalic}
+                  onClick={() => handleToggle("italic")}
                 >
                   <FontAwesomeIcon icon={faItalic} />
                 </button>
@@ -119,7 +120,7 @@ const TableVisual: React.FC<TableVisualProps> = ({
                   className={`formatting-button ${
                     formattingSettings.underline ? "active" : ""
                   }`}
-                  onClick={handleToggleUnderline}
+                  onClick={() => handleToggle("underline")}
                 >
                   <FontAwesomeIcon icon={faUnderline} />
                 </button>
@@ -130,14 +131,15 @@ const TableVisual: React.FC<TableVisualProps> = ({
               <div>
                 <select
                   value={formattingSettings.scaling}
-                  onChange={handleScalingChange}
+                  onChange={(e) =>
+                    handleScalingChange(
+                      e.target.value as VisualFormattingSettingsModel["scaling"]
+                    )
+                  }
                 >
                   <option value="none">None</option>
                   <option value="thousands">Thousands</option>
                   <option value="millions">Millions</option>
-                  <option value="auto">Auto</option>
-                  <option value="billions">Billions</option>
-                  <option value="trillions">Trillions</option>
                 </select>
               </div>
             </div>
@@ -146,7 +148,11 @@ const TableVisual: React.FC<TableVisualProps> = ({
               <div>
                 <select
                   value={formattingSettings.theme}
-                  onChange={handleThemeChange}
+                  onChange={(e) =>
+                    handleThemeChange(
+                      e.target.value as VisualFormattingSettingsModel["theme"]
+                    )
+                  }
                 >
                   <option value="light">Light</option>
                   <option value="dark">Dark</option>
@@ -182,9 +188,9 @@ const TableVisual: React.FC<TableVisualProps> = ({
                         {!isNaN(dataItem[column.field]) &&
                         isFinite(dataItem[column.field])
                           ? formatNumber(
-                              dataItem[column.field],
-                              formattingSettings.scaling
-                            )
+                            dataItem[column.field],
+                            formattingSettings.scaling
+                          )
                           : dataItem[column.field]}
                       </span>
                     </td>

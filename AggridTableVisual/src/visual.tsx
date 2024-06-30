@@ -39,8 +39,8 @@ export class Visual {
     console.log("Visual constructor", options);
     this.target = options.element;
     this.formattingSettingsService = new FormattingSettingsService();
-    this.formattingSettings = { ...defaultFormattingSettings }; 
     this.host = options.host;
+    this.formattingSettings = { ...defaultFormattingSettings }; 
   }
   
   public update(options: VisualUpdateOptions) {
@@ -52,7 +52,7 @@ export class Visual {
       this.formattingSettingsService.populateFormattingSettingsModel(
         VisualFormattingSettingsModel,
         options.dataViews[0]
-      );
+      ) || defaultFormattingSettings;
 
     this.columnData = dataViews[0].table.columns.map((item) => ({
       field: item.displayName,
@@ -104,9 +104,9 @@ export class Visual {
     );
   }
 
-  private handleSettingsChange = (newSettings: VisualFormattingSettingsModel) => {
+  private handleSettingsChange = (newSettings: Partial<VisualFormattingSettingsModel>) => {
     this.formattingSettings = { ...this.formattingSettings, ...newSettings };
-
+  
     this.host.persistProperties({
       merge: [
         {
@@ -122,10 +122,10 @@ export class Visual {
         },
       ],
     });
-
+  
     this.render();
   };
-
+  
   public destroy() {
     ReactDOM.unmountComponentAtNode(this.target);
   }

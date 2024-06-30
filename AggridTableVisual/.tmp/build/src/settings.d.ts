@@ -9,8 +9,8 @@ export interface VisualFormattingSettingsModel {
     bold: boolean;
     italic: boolean;
     underline: boolean;
-    scaling: 'none' | 'thousands' | 'millions' | 'auto' | 'billions' | 'trillions';
-    theme: 'light' | 'dark';
+    scaling: string;
+    theme: string;
 }
 declare class DemoSection extends FormattingSettingsCard {
     title: formattingSettings.TextInput;
