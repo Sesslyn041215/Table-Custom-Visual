@@ -1,12 +1,17 @@
 {
   "dataRoles": [
     {
-      "displayName": "Column Data",
-      "name": "column",
+      "displayName": "Rows",
+      "name": "rows",
       "kind": "Grouping"
     },
     {
-      "displayName": "Value Data",
+      "displayName": "Columns",
+      "name": "columns",
+      "kind": "Grouping"
+    },
+    {
+      "displayName": "Value",
       "name": "value",
       "kind": "Measure"
     }
@@ -24,22 +29,23 @@
       }
     }
   },
-  "dataViewMappings": [
+ "dataViewMappings": [
     {
-      "table": {
+      "matrix": {
         "rows": {
-          "select": [
-            {
-              "for": {
-                "in": "column"
-              }
-            },
-            {
-              "for": {
-                "in": "value"
-              }
-            }
-          ]
+          "for": {
+            "in": "rows"
+          }
+        },
+        "columns": {
+          "for": {
+            "in": "columns"
+          }
+        },
+        "values": {
+          "for": {
+            "in": "value"
+          }
         }
       }
     }

@@ -89,3 +89,6 @@
 .dark-theme .table-visual tbody tr:nth-child(even) {
   background-color: #555;
 }
+.selected{
+  background-color: #d3d3d3;
+}

@@ -6,14 +6,20 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as React from "react";
 import { VisualFormattingSettingsModel } from "./settings";
+import ISelectionManager = powerbi.extensibility.ISelectionManager;
+import ISelectionId = powerbi.visuals.ISelectionId;
+import IVisualHost = powerbi.extensibility.visual.IVisualHost;
 
-interface TableVisualProps {
+export interface TableVisualProps {
   row: any[];
   col: any[];
   title?: string;
   subtitle?: string;
   formattingSettings: VisualFormattingSettingsModel;
   onSettingsChange: (settings: VisualFormattingSettingsModel) => void;
+  selectionManager: ISelectionManager;
+  host: IVisualHost;
+  rowLevels: any;
 }
 
 const TableVisual: React.FC<TableVisualProps> = ({
@@ -23,15 +29,20 @@ const TableVisual: React.FC<TableVisualProps> = ({
   subtitle = "Default Subtitle",
   formattingSettings,
   onSettingsChange,
+  selectionManager,
+  host,
+  rowLevels,
 }) => {
+  const [selectedRowIndex, setSelectedRowIndex] = React.useState<number | null>(null);
+
   const handleToggle = (property: keyof VisualFormattingSettingsModel) => {
     const newSettings: VisualFormattingSettingsModel = {
       bold: false,
       italic: false,
       underline: false,
-      ...formattingSettings, 
+      ...formattingSettings,
     };
- 
+
     if (property) {
       switch (property) {
         case "bold":
@@ -55,7 +66,7 @@ const TableVisual: React.FC<TableVisualProps> = ({
     }
     onSettingsChange(newSettings);
   };
-  
+
   const handleThemeChange = (key: VisualFormattingSettingsModel["theme"]) => {
     onSettingsChange({ ...formattingSettings, theme: key });
   };
@@ -71,7 +82,7 @@ const TableVisual: React.FC<TableVisualProps> = ({
     scaling: VisualFormattingSettingsModel["scaling"]
   ): string => {
     const numericValue = typeof value === 'string' ? parseFloat(value.replace(/[^\d.-]/g, '')) : value;
-  
+
     if (!isNaN(numericValue) && isFinite(numericValue)) {
       switch (scaling) {
         case "millions":
@@ -83,10 +94,19 @@ const TableVisual: React.FC<TableVisualProps> = ({
           return numericValue.toString();
       }
     } else {
-      return ""; 
+      return "";
     }
   };
-  
+
+  const handleRowClick = async (row: any, rowIndex: number) => {
+    const selectionId: ISelectionId = host
+      .createSelectionIdBuilder()
+      .withMatrixNode(row, rowLevels)
+      .createSelectionId();
+    await selectionManager.select(selectionId);
+    setSelectedRowIndex(rowIndex);
+  };
+
   return (
     <div
       className={`table-visual ${
@@ -95,7 +115,7 @@ const TableVisual: React.FC<TableVisualProps> = ({
     >
       <div className="table-visual-header">
         <div className="left-section">
-          <h2>Table</h2>
+          <h2>Custom Visual</h2>
           <div className="formatting-controls">
             <div className="label">
               <div>Formatting</div>
@@ -168,15 +188,23 @@ const TableVisual: React.FC<TableVisualProps> = ({
           <table className="table">
             <thead>
               <tr>
-                {col.map((column: any, index: number) => (
-                  <th key={index}>{column.field}</th>
+                <th>Category</th>
+                {col.map((column, index) => (
+                  <th key={column.levelValues?.[0]?.value + "_" + index}>
+                    <span>{column.levelValues?.[0]?.value}</span>
+                  </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {row.map((dataItem: any, rowIndex: number) => (
-                <tr key={rowIndex}>
-                  {col.map((column: any, colIndex: number) => (
+              {row.map((rowData, rowIndex) => (
+                <tr
+                  key={rowIndex}
+                  onClick={() => handleRowClick(rowData, rowIndex)}
+                  className={selectedRowIndex === rowIndex ? "selected" : ""}
+                >
+                  <td>{rowData.levelValues?.[0]?.value}</td>
+                  {col.map((column, colIndex) => (
                     <td key={`${rowIndex}-${colIndex}`}>
                       <span
                         className={`formatted-cell ${
@@ -185,13 +213,13 @@ const TableVisual: React.FC<TableVisualProps> = ({
                           formattingSettings.underline ? "underline" : ""
                         }`}
                       >
-                        {!isNaN(dataItem[column.field]) &&
-                        isFinite(dataItem[column.field])
+                        {!isNaN(rowData.values?.[colIndex]?.value) &&
+                        isFinite(rowData.values?.[colIndex]?.value)
                           ? formatNumber(
-                            dataItem[column.field],
-                            formattingSettings.scaling
-                          )
-                          : dataItem[column.field]}
+                              rowData.values?.[colIndex]?.value,
+                              formattingSettings.scaling
+                            )
+                          : rowData.values?.[colIndex]?.value}
                       </span>
                     </td>
                   ))}

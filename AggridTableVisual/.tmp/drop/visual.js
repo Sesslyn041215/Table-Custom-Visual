@@ -1679,10 +1679,20 @@ class VisualFormattingSettingsModel extends FormattingSettingsModel {
 /* harmony import */ var _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(188);
 /* harmony import */ var _fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(784);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(540);
+var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 
 
 
-const TableVisual = ({ row, col, title = "Default Title", subtitle = "Default Subtitle", formattingSettings, onSettingsChange, }) => {
+const TableVisual = ({ row, col, title = "Default Title", subtitle = "Default Subtitle", formattingSettings, onSettingsChange, selectionManager, host, rowLevels, }) => {
+    const [selectedRowIndex, setSelectedRowIndex] = react__WEBPACK_IMPORTED_MODULE_1__.useState(null);
     const handleToggle = (property) => {
         const newSettings = Object.assign({ bold: false, italic: false, underline: false }, formattingSettings);
         if (property) {
@@ -1731,10 +1741,18 @@ const TableVisual = ({ row, col, title = "Default Title", subtitle = "Default Su
             return "";
         }
     };
+    const handleRowClick = (row, rowIndex) => __awaiter(void 0, void 0, void 0, function* () {
+        const selectionId = host
+            .createSelectionIdBuilder()
+            .withMatrixNode(row, rowLevels)
+            .createSelectionId();
+        yield selectionManager.select(selectionId);
+        setSelectedRowIndex(rowIndex);
+    });
     return (react__WEBPACK_IMPORTED_MODULE_1__.createElement("div", { className: `table-visual ${formattingSettings.theme === "dark" ? "dark-theme" : "light-theme"}` },
         react__WEBPACK_IMPORTED_MODULE_1__.createElement("div", { className: "table-visual-header" },
             react__WEBPACK_IMPORTED_MODULE_1__.createElement("div", { className: "left-section" },
-                react__WEBPACK_IMPORTED_MODULE_1__.createElement("h2", null, "Table"),
+                react__WEBPACK_IMPORTED_MODULE_1__.createElement("h2", null, "Custom Visual"),
                 react__WEBPACK_IMPORTED_MODULE_1__.createElement("div", { className: "formatting-controls" },
                     react__WEBPACK_IMPORTED_MODULE_1__.createElement("div", { className: "label" },
                         react__WEBPACK_IMPORTED_MODULE_1__.createElement("div", null, "Formatting"),
@@ -1763,12 +1781,26 @@ const TableVisual = ({ row, col, title = "Default Title", subtitle = "Default Su
                 react__WEBPACK_IMPORTED_MODULE_1__.createElement("p", null, subtitle),
                 react__WEBPACK_IMPORTED_MODULE_1__.createElement("table", { className: "table" },
                     react__WEBPACK_IMPORTED_MODULE_1__.createElement("thead", null,
-                        react__WEBPACK_IMPORTED_MODULE_1__.createElement("tr", null, col.map((column, index) => (react__WEBPACK_IMPORTED_MODULE_1__.createElement("th", { key: index }, column.field))))),
-                    react__WEBPACK_IMPORTED_MODULE_1__.createElement("tbody", null, row.map((dataItem, rowIndex) => (react__WEBPACK_IMPORTED_MODULE_1__.createElement("tr", { key: rowIndex }, col.map((column, colIndex) => (react__WEBPACK_IMPORTED_MODULE_1__.createElement("td", { key: `${rowIndex}-${colIndex}` },
-                        react__WEBPACK_IMPORTED_MODULE_1__.createElement("span", { className: `formatted-cell ${formattingSettings.bold ? "bold" : ""} ${formattingSettings.italic ? "italic" : ""} ${formattingSettings.underline ? "underline" : ""}` }, !isNaN(dataItem[column.field]) &&
-                            isFinite(dataItem[column.field])
-                            ? formatNumber(dataItem[column.field], formattingSettings.scaling)
-                            : dataItem[column.field])))))))))))));
+                        react__WEBPACK_IMPORTED_MODULE_1__.createElement("tr", null,
+                            react__WEBPACK_IMPORTED_MODULE_1__.createElement("th", null, "Category"),
+                            col.map((column, index) => {
+                                var _a, _b, _c, _d;
+                                return (react__WEBPACK_IMPORTED_MODULE_1__.createElement("th", { key: ((_b = (_a = column.levelValues) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.value) + "_" + index },
+                                    react__WEBPACK_IMPORTED_MODULE_1__.createElement("span", null, (_d = (_c = column.levelValues) === null || _c === void 0 ? void 0 : _c[0]) === null || _d === void 0 ? void 0 : _d.value)));
+                            }))),
+                    react__WEBPACK_IMPORTED_MODULE_1__.createElement("tbody", null, row.map((rowData, rowIndex) => {
+                        var _a, _b;
+                        return (react__WEBPACK_IMPORTED_MODULE_1__.createElement("tr", { key: rowIndex, onClick: () => handleRowClick(rowData, rowIndex), className: selectedRowIndex === rowIndex ? "selected" : "" },
+                            react__WEBPACK_IMPORTED_MODULE_1__.createElement("td", null, (_b = (_a = rowData.levelValues) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.value),
+                            col.map((column, colIndex) => {
+                                var _a, _b, _c, _d, _e, _f, _g, _h;
+                                return (react__WEBPACK_IMPORTED_MODULE_1__.createElement("td", { key: `${rowIndex}-${colIndex}` },
+                                    react__WEBPACK_IMPORTED_MODULE_1__.createElement("span", { className: `formatted-cell ${formattingSettings.bold ? "bold" : ""} ${formattingSettings.italic ? "italic" : ""} ${formattingSettings.underline ? "underline" : ""}` }, !isNaN((_b = (_a = rowData.values) === null || _a === void 0 ? void 0 : _a[colIndex]) === null || _b === void 0 ? void 0 : _b.value) &&
+                                        isFinite((_d = (_c = rowData.values) === null || _c === void 0 ? void 0 : _c[colIndex]) === null || _d === void 0 ? void 0 : _d.value)
+                                        ? formatNumber((_f = (_e = rowData.values) === null || _e === void 0 ? void 0 : _e[colIndex]) === null || _f === void 0 ? void 0 : _f.value, formattingSettings.scaling)
+                                        : (_h = (_g = rowData.values) === null || _g === void 0 ? void 0 : _g[colIndex]) === null || _h === void 0 ? void 0 : _h.value)));
+                            })));
+                    })))))));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (TableVisual);
 
@@ -1821,28 +1853,27 @@ class Visual {
         this.formattingSettingsService = new powerbi_visuals_utils_formattingmodel__WEBPACK_IMPORTED_MODULE_0__/* .FormattingSettingsService */ .O();
         this.host = options.host;
         this.formattingSettings = Object.assign({}, _settings__WEBPACK_IMPORTED_MODULE_3__/* .defaultFormattingSettings */ .u);
+        this.selectionManager = this.host.createSelectionManager();
     }
     update(options) {
-        const dataViews = options.dataViews;
+        var _a, _b, _c, _d, _e, _f, _g, _h;
+        const singleDataView = options.dataViews[0];
         const newFormattingSettings = this.formattingSettingsService.populateFormattingSettingsModel(_settings__WEBPACK_IMPORTED_MODULE_3__/* .VisualFormattingSettingsModel */ .S, options.dataViews[0]) || _settings__WEBPACK_IMPORTED_MODULE_3__/* .defaultFormattingSettings */ .u;
         this.formattingSettings = Object.assign(Object.assign({}, this.formattingSettings), newFormattingSettings);
-        this.columnData = dataViews[0].table.columns.map((item) => ({
-            field: item.displayName,
-        }));
-        this.rowData = dataViews[0].table.rows.map((item) => item.reduce((acc, itemval, index) => {
-            acc[this.columnData[index].field] = itemval;
-            return acc;
-        }, {}));
+        this.rows = ((_c = (_b = (_a = singleDataView === null || singleDataView === void 0 ? void 0 : singleDataView.matrix) === null || _a === void 0 ? void 0 : _a.rows) === null || _b === void 0 ? void 0 : _b.root) === null || _c === void 0 ? void 0 : _c.children) || [];
+        this.columns = ((_f = (_e = (_d = singleDataView === null || singleDataView === void 0 ? void 0 : singleDataView.matrix) === null || _d === void 0 ? void 0 : _d.columns) === null || _e === void 0 ? void 0 : _e.root) === null || _f === void 0 ? void 0 : _f.children) || [];
+        this.rowLevels = (_h = (_g = singleDataView === null || singleDataView === void 0 ? void 0 : singleDataView.matrix) === null || _g === void 0 ? void 0 : _g.rows) === null || _h === void 0 ? void 0 : _h.levels;
         this.title = "Table";
-        this.subtitle = "Table Sub Title";
-        if (dataViews[0].metadata.objects &&
-            dataViews[0].metadata.objects.demoSection) {
-            if (dataViews[0].metadata.objects.demoSection.title) {
-                this.title = dataViews[0].metadata.objects.demoSection.title.toString();
+        this.subtitle = "Matrix";
+        if (singleDataView.metadata.objects &&
+            singleDataView.metadata.objects.demoSection) {
+            if (singleDataView.metadata.objects.demoSection.title) {
+                this.title =
+                    singleDataView.metadata.objects.demoSection.title.toString();
             }
-            if (dataViews[0].metadata.objects.demoSection.subTitle) {
+            if (singleDataView.metadata.objects.demoSection.subTitle) {
                 this.subtitle =
-                    dataViews[0].metadata.objects.demoSection.subTitle.toString();
+                    singleDataView.metadata.objects.demoSection.subTitle.toString();
             }
         }
         this.render();
@@ -1851,7 +1882,7 @@ class Visual {
         return this.formattingSettingsService.buildFormattingModel(this.formattingSettings);
     }
     render() {
-        react_dom__WEBPACK_IMPORTED_MODULE_2__.render(react__WEBPACK_IMPORTED_MODULE_1__.createElement(this.tableVisual, { row: this.rowData, col: this.columnData, title: this.title, subtitle: this.subtitle, formattingSettings: this.formattingSettings, onSettingsChange: this.handleSettingsChange }), this.target);
+        react_dom__WEBPACK_IMPORTED_MODULE_2__.render(react__WEBPACK_IMPORTED_MODULE_1__.createElement(this.tableVisual, { row: this.rows, col: this.columns, title: this.title, subtitle: this.subtitle, formattingSettings: this.formattingSettings, onSettingsChange: this.handleSettingsChange, selectionManager: this.selectionManager, host: this.host, rowLevels: this.rowLevels }), this.target);
     }
     destroy() {
         react_dom__WEBPACK_IMPORTED_MODULE_2__.unmountComponentAtNode(this.target);
