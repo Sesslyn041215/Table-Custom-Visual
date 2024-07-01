@@ -45,15 +45,16 @@ export class Visual {
   
   public update(options: VisualUpdateOptions) {
     const dataViews = options.dataViews;
-
-    console.log(options);
-
-    this.formattingSettings =
+    const newFormattingSettings =
       this.formattingSettingsService.populateFormattingSettingsModel(
         VisualFormattingSettingsModel,
         options.dataViews[0]
       ) || defaultFormattingSettings;
-
+ 
+    this.formattingSettings = {
+      ...this.formattingSettings, 
+      ...newFormattingSettings 
+    };
     this.columnData = dataViews[0].table.columns.map((item) => ({
       field: item.displayName,
     }));

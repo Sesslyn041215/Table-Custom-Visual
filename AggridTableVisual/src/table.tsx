@@ -95,7 +95,7 @@ const TableVisual: React.FC<TableVisualProps> = ({
     >
       <div className="table-visual-header">
         <div className="left-section">
-          <h2>{JSON.stringify(formattingSettings, null, 2)}</h2>
+          <h2>Table</h2>
           <div className="formatting-controls">
             <div className="label">
               <div>Formatting</div>

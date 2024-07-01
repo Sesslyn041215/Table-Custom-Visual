@@ -1734,7 +1734,7 @@ const TableVisual = ({ row, col, title = "Default Title", subtitle = "Default Su
     return (react__WEBPACK_IMPORTED_MODULE_1__.createElement("div", { className: `table-visual ${formattingSettings.theme === "dark" ? "dark-theme" : "light-theme"}` },
         react__WEBPACK_IMPORTED_MODULE_1__.createElement("div", { className: "table-visual-header" },
             react__WEBPACK_IMPORTED_MODULE_1__.createElement("div", { className: "left-section" },
-                react__WEBPACK_IMPORTED_MODULE_1__.createElement("h2", null, JSON.stringify(formattingSettings, null, 2)),
+                react__WEBPACK_IMPORTED_MODULE_1__.createElement("h2", null, "Table"),
                 react__WEBPACK_IMPORTED_MODULE_1__.createElement("div", { className: "formatting-controls" },
                     react__WEBPACK_IMPORTED_MODULE_1__.createElement("div", { className: "label" },
                         react__WEBPACK_IMPORTED_MODULE_1__.createElement("div", null, "Formatting"),
@@ -1824,9 +1824,8 @@ class Visual {
     }
     update(options) {
         const dataViews = options.dataViews;
-        console.log(options);
-        this.formattingSettings =
-            this.formattingSettingsService.populateFormattingSettingsModel(_settings__WEBPACK_IMPORTED_MODULE_3__/* .VisualFormattingSettingsModel */ .S, options.dataViews[0]) || _settings__WEBPACK_IMPORTED_MODULE_3__/* .defaultFormattingSettings */ .u;
+        const newFormattingSettings = this.formattingSettingsService.populateFormattingSettingsModel(_settings__WEBPACK_IMPORTED_MODULE_3__/* .VisualFormattingSettingsModel */ .S, options.dataViews[0]) || _settings__WEBPACK_IMPORTED_MODULE_3__/* .defaultFormattingSettings */ .u;
+        this.formattingSettings = Object.assign(Object.assign({}, this.formattingSettings), newFormattingSettings);
         this.columnData = dataViews[0].table.columns.map((item) => ({
             field: item.displayName,
         }));
