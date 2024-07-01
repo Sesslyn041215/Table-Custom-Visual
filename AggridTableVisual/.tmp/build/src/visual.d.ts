@@ -1,5 +1,5 @@
 import powerbi from "powerbi-visuals-api";
-import "../style/visual.css";
+import "../style/visual.less";
 import VisualUpdateOptions = powerbi.extensibility.visual.VisualUpdateOptions;
 import VisualConstructorOptions = powerbi.extensibility.visual.VisualConstructorOptions;
 import FormattingModel = powerbi.visuals.FormattingModel;

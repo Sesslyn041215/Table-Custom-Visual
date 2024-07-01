@@ -4,7 +4,7 @@ import powerbi from "powerbi-visuals-api";
 import { FormattingSettingsService } from "powerbi-visuals-utils-formattingmodel";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import "../style/visual.css";
+import "../style/visual.less";
 import {
   VisualFormattingSettingsModel,
   defaultFormattingSettings,
